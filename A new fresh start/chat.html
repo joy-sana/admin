@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Quiz Questions</title>
+    <style>
+      /* Style for the quiz questions */
+      .quiz-question {
+        margin: 10px 0;
+      }
+      .quiz-question h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      .quiz-question label {
+        font-size: 14px;
+        display: block;
+        margin-bottom: 5px;
+      }
+      .quiz-question input[type="radio"] {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="quiz-container">
+    </div>
+
+    <script>
+      // Load quiz questions from the database
+      const xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          const questions = JSON.parse(this.responseText);
+          const quizContainer = document.getElementById('quiz-container');
+          questions.forEach(question => {
+            // Create the question element
+            const questionElem = document.createElement('div');
+            questionElem.className = 'quiz-question';
+
+            // Add the question text
+            const questionTextElem = document.createElement('h3');
+            questionTextElem.textContent = question.question;
+            questionElem.appendChild(questionTextElem);
+
+            // Add the answer options
+            question.options.forEach(option => {
+              const optionId = `question-${question.id}-option-${option.id}`;
+              const labelElem = document.createElement('label');
+              labelElem.setAttribute('for', optionId);
+              const radioElem = document.createElement('input');
+              radioElem.type = 'radio';
+              radioElem.id = optionId;
+              radioElem.name = `question-${question.id}`;
+              radioElem.value = option.id;
+              labelElem.appendChild(radioElem);
+              const optionTextElem = document.createElement('span');
+              optionTextElem.textContent = option.option_text;
+              labelElem.appendChild(optionTextElem);
+              questionElem.appendChild(labelElem);
+            });
+
+            quizContainer.appendChild(questionElem);
+          });
+        }
+      };
+      xhttp.open('GET', 'get-questions.php', true);
+      xhttp.send();
+    </script>
+  </body>
+</html>
